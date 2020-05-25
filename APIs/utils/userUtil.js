@@ -56,7 +56,6 @@ class UserUtil{
     static async setSession(user_id){
         let token = suid(16);
         let sql = `select id from users where id = '${user_id}'`;
-        console.log(sql);
         try{
             let result = await con.query(sql);
             let user_id = result[0]['id'];
