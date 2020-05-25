@@ -7,7 +7,7 @@ class OtpUtil {
     static async generateOtp(mobile){
         let otp = undefined;
         mobile = mobile.trim();
-        let otps = await con.query(`Select otp from bf_otp where user_phone = ${mobile} and date_added >= NOW() - INTERVAL 5 MINUTE`);
+        let otps = await con.query(`Select otp from otp where mobile = ${mobile} and date_added >= NOW() - INTERVAL 5 MINUTE`);
         if(otps.length>0){
             otp = otps[0].otp;
         }else{
@@ -34,7 +34,7 @@ class OtpUtil {
             }
         }
 
-        let otps = await con.query(`Select * from bf_otp where user_phone = ${mobile} and data like '${data}' and date_added >= NOW() - INTERVAL 5 MINUTE`);
+        let otps = await con.query(`Select * from otp where mobile = ${mobile} and data like '${data}' and date_added >= NOW() - INTERVAL 5 MINUTE`);
 
         if(otps.length > 0){        //checking if otp already exists
             if(otps[0].attempt_count >= 5 ){    //checking for the count of otp requests within 5 minutes
@@ -49,7 +49,7 @@ class OtpUtil {
                     if(mobile != '9999999999'){
                         response = await msg91.send(mobile,message);
                     }
-                    await con.query(`update bf_otp set attempt_count = ${otps[0].attempt_count+1} where id = ${otps[0].id}`);  //sending previous otp and increasing count
+                    await con.query(`update otp set attempt_count = ${otps[0].attempt_count+1} where id = ${otps[0].id}`);  //sending previous otp and increasing count
                     return {
                         success:true,
                         token:otps[0].token
@@ -72,7 +72,7 @@ class OtpUtil {
                 if(mobile != '9999999999'){
                     response = await msg91.send(mobile,message);
                 }
-                await con.query(`insert into bf_otp(user_phone,otp,token,purpose,data,otp_type,is_verified,attempt_count,date_added,date_updated,status) 
+                await con.query(`insert into otp(mobile,otp,token,purpose,data,otp_type,is_verified,attempt_count,date_added,date_updated,status) 
                                 values('${mobile}','${otp}','${token}','${purpose}','${data}','${otp_type}','n  ',0,now(),now(),'a')`);
                 return{
                     success:true,

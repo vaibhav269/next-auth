@@ -4,8 +4,8 @@ const util = require('util');
 const pool = mysql.createPool({ 
     host: "localhost",
     user: 'vaibhav',
-    password: "test",
-    database:'ql_billfree',
+    password: "tester",
+    database:'qfree',
 });
 
 pool.query = util.promisify(pool.query);    //to make it support async await 

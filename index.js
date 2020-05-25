@@ -1,7 +1,7 @@
 const next = require('next');
 const express = require('express');
 const dev = process.env.NODE_ENV !== 'production';
-const port = process.env.port || 6000;
+const port = process.env.port || 3000;
 const http = require("http");
 const cookieParser = require('cookie-parser');
 const uid = require('rand-token').uid;
@@ -15,12 +15,6 @@ app.prepare().then(()=>{
     expApp.use(express.json());
 
     expApp.use(cookieParser());    
-
-    expApp.get('/api/get-messages',(req,res)=>{
-        res.status(200).send({
-            messages:messages
-        });
-    });
 
     require('./APIs/signup')(expApp);
     require('./APIs/signin')(expApp);

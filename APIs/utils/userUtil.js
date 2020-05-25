@@ -3,7 +3,7 @@ var suid = require('rand-token').suid;
 
 class UserUtil{
     static async isEmailUnique(email){   //returns true if email is unique(i.e  doesn't exist in database) otherwise false
-        let sql = `select count(*) as count from bf_users where user_email like '${email}'`;
+        let sql = `select count(*) as count from users where email like '${email}'`;
 
         try{
             let result = await con.query(sql);
@@ -20,7 +20,7 @@ class UserUtil{
     }
 
     static async isMobileUnique(mobile){   //returns true if mobile is unique(i.e  doesn't exist in database) otherwise false
-        let sql = `select count(*) as count from bf_users where user_phone like '${mobile}'`;
+        let sql = `select count(*) as count from users where mobile like '${mobile}'`;
 
         try{
             let result = await con.query(sql);
@@ -53,10 +53,14 @@ class UserUtil{
         }
     }
 
-    static async setSession(userId,dev_token='',dev_info='',os='',user_type = 'user'){
+    static async setSession(user_id){
         let token = suid(16);
+        let sql = `select id from users where id = '${user_id}'`;
+        console.log(sql);
         try{
-            sql = `insert into bf_tokens(user_id,dev_token,dev_info,auth_token,os,user_type,date_added,date_updated,status) values(${userId},'${dev_token}','${dev_info}','${token}','${os}','${user_type}',now(),now(),'a')`;
+            let result = await con.query(sql);
+            let user_id = result[0]['id'];
+            sql = `insert into user_sessions(user_id,token) values(${user_id},'${token}')`;
             let result1 = await con.query(sql);
             return {
                 success:true,
@@ -75,7 +79,7 @@ class UserUtil{
 
     static async verifySession(token){
         try{
-            let sql = `select id from bf_tokens where auth_token = '${token}'`;
+            let sql = `select id from user_sessions where token = '${token}'`;
             let result = await con.query(sql);
             if(result.length == 0){
                 return {
@@ -98,13 +102,12 @@ class UserUtil{
 
     static async deleteSession(token){
         try{
-            let sql = `update bf_tokens set status = 'i' where auth_token = '${token}'`;
+            let sql = `delete from user_sessions where token = '${token}'`;
             let result = await con.query(sql);
             return{
                 success:true
             }
         }catch(err){
-            console.log(err);
             return{
                 success:false,
                 err:err
@@ -114,13 +117,14 @@ class UserUtil{
 
     static async getProfile(token){
         try{
-            let sql = `select users.id as user_id,name,gender,mobile,connected,online,conn_lock from users inner join user_sessions on users.id = user_sessions.userId where token = '${token}'`;
+            let sql = `select users.id,name from users inner join user_sessions on users.id = user_sessions.user_id where token = '${token}'`;
             let result = await con.query(sql);
             return {
                 success: true,
                 result: result[0]
             }
         } catch (err) {
+            console.log(err);
             return {
                 success: false,
                 err: err

@@ -1,6 +1,5 @@
 var otpUtil  = require('./utils/otpUtil');
 var UtilUsers  = require('./utils/userUtil');
-var bcrypt   = require('bcrypt-nodejs');
 var md5 = require('md5');
 
 module.exports = function(app){

@@ -1,4 +1,3 @@
-var bcrypt   = require('bcrypt-nodejs');
 var con = require('../config/db');
 var UtilUsers  = require('./utils/userUtil');
 var md5 = require('md5');
@@ -56,9 +55,9 @@ module.exports = function(app){
         }
 
         if(type == 'mobile'){
-            sql = `SELECT id,password from bf_users where user_phone = '${username}'`;
+            sql = `SELECT id,password from users where mobile = '${username}'`;
         }else if(type == 'username'){
-            sql = `SELECT id,password from bf_users where username = '${username}'`;
+            sql = `SELECT id,password from users where username = '${username}'`;
         }
 
         try{
